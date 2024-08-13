@@ -218,7 +218,8 @@ if prompt := st.chat_input():
                 # logger.log(ANALYSIS_LEVEL, f"Response to {st.session_state['user_id']}: {response}")
 
                 # Split the answer into two parts: before "Reference:" and the references part
-                parts = re.split(r'Reference:\s*', response, maxsplit=1)
+                #parts = re.split(r'Reference:\s*', response, maxsplit=1)
+                parts = response.rsplit('Reference:', 1)
                 # Extract the text before "Reference:"
                 answer_without_references = parts[0].strip()
                 st.markdown(answer_without_references)
