@@ -235,7 +235,7 @@ if prompt := st.chat_input():
                     counter = 0
                     for reference in references:
                         with st.expander(reference.strip()):
-                            st.markdown(all_references.iloc[counter]['text'])
+                            st.markdown(all_references.iloc[counter]['text'], unsafe_allow_html=True)
                         counter = counter + 1
 
                 ############################################################################
