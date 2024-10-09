@@ -1,4 +1,4 @@
-import re
+from io import StringIO
 import pandas as pd
 from regulations_rag.document import Document
 from regulations_rag.reference_checker import ReferenceChecker
@@ -14,7 +14,12 @@ class Article_47_BCR(Document):
         analysis = self.AnalysisSection()
         reference_checker = MultiReferenceChecker([main, alt, analysis])
 
-        self.document_as_df = pd.read_csv(path_to_manual_as_csv_file, sep="|", encoding="utf-8", na_filter=False)  
+        with open(path_to_manual_as_csv_file, 'r', encoding='utf-8') as file:
+            content = file.read().replace('\r', '\n')
+
+        # Use pd.read_csv to read the modified content
+        self.document_as_df = pd.read_csv(StringIO(content), sep="|", encoding="utf-8", na_filter=False)
+        
         # Check for NaN values in the DataFrame
         if self.document_as_df.isna().any().any():
             msg = f'Encountered NaN values while loading the GDPR manual. This will cause ugly issues with the get_regulation_detail method'

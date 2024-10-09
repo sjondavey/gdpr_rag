@@ -14,6 +14,16 @@ from regulations_rag.regulation_table_of_content import StandardTableOfContent
 if 'chat' not in st.session_state:
     st.switch_page('question_answering.py')
 
+st.title('Table of Content')
+
+st.markdown('**A few quirks to note when navigating this page:**\n\
+- Click on the triangle to the left of the word "Corpus" below to expand the source documents.\n\
+- If the triangle rotates (as if it\'s expanding) but nothing happens, try selecting the word "Corpus" (it should change to red) and then press the triangle again to expand the list. \n\
+- The Table of Content generally functions as expected after the first level of the tree has been expanded.')
+st.markdown('Want more documents included? Reach out to me on <a href="https://www.linkedin.com/in/steven-davey-12295415" target="_blank">linkedin</a>', unsafe_allow_html=True)
+st.markdown("---")
+    
+
 def load_class_from_file(filepath):
     spec = importlib.util.spec_from_file_location("module.name", filepath)
     module = importlib.util.module_from_spec(spec)
@@ -46,7 +56,7 @@ def anytree_to_treeitem(node):
 
 
 
-
+@st.cache_resource
 def load_tree_data():
     date_ordered_list_of_documents = ['gdpr.py', 'article_30_5.py', 'article_47_bcr.py', 'decision_making.py', 'dpia.py', 'dpo.py', 'article_49_intl_transfer.py',
                                     'lead_sa.py', 'data_breach.py', 'data_portability.py', 'transparency.py', 'codes.py', 'online_services.py', 'territorial_scope.py',
