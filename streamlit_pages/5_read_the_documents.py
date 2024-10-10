@@ -1,6 +1,6 @@
 import os
 import streamlit as st
-from streamlit_common import _get_blob_for_session_data_logging, setup_log_storage
+from streamlit_common import _get_blob_for_session_data_logging
 
 st.title('Documentation')
 

@@ -36,7 +36,7 @@ def _get_openai_resource(openai_key):
 @st.cache_resource
 def _get_blog_container():
     if st.session_state['use_environmental_variables']:
-        connection_string = f"DefaultEndpointsProtocol=https;AccountName=chatlogsaccount;AccountKey={st.session_state['blob_store_key']};EndpointSuffix=core.windows.net"
+        connection_string = f"DefaultEndpointsProtocol=https;AccountName=gdprragstorageaccount;AccountKey={st.session_state['blob_store_key']};EndpointSuffix=core.windows.net"
         # Create the BlobServiceClient object using the connection string
         blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     else:
@@ -178,7 +178,7 @@ def setup_log_storage(filename):
     if st.session_state['service_provider'] == 'azure':
         if st.session_state['use_environmental_variables'] == True:
             if 'blob_account_url' not in st.session_state:
-                st.session_state['blob_account_url'] = "https://chatlogsaccount.blob.core.windows.net/"
+                st.session_state['blob_account_url'] = "https://gdprragstorageaccount.blob.core.windows.net/"
                 st.session_state['blob_container_name'] = os.getenv('BLOB_CONTAINER', 'gdprtest01') # set a default in case 'BLOB_CONTAINER' is not set
                 st.session_state['blob_store_key'] = os.getenv("CHAT_BLOB_STORE")
                 st.session_state['blob_client_for_session_data'] = _get_blob_for_session_data_logging(filename)
