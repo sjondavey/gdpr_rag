@@ -72,7 +72,7 @@ try:
     # list of icons here: https://fonts.google.com/icons
     ask_question_page = st.Page("streamlit_pages/1_answer.py", title="Ask a question", default=True, icon=":material/forum:")
     toc_question_page = st.Page("streamlit_pages/2_table_of_content.py", title="Table of content", icon=":material/list:")
-    documentation_page = st.Page("streamlit_pages/5_Read_the_Documents.py", title="Read the documents", icon=":material/article:")
+    documentation_page = st.Page("streamlit_pages/5_read_the_documents.py", title="Read the documents", icon=":material/article:")
     pg = st.navigation({"Other things to do": [ask_question_page, toc_question_page, documentation_page]})
     pg.run()
 
@@ -89,6 +89,6 @@ except Exception as e:
     error_string = "user: " + st.session_state["user_id"] + ": \n" + error_traceback
     logger = logging.getLogger(__name__)
     logger.error(error_string)
-    #write_global_data_to_blob()
-    #write_session_data_to_blob(error_string)
+    write_global_data_to_blob()
+    write_session_data_to_blob(error_string)
     raise e
