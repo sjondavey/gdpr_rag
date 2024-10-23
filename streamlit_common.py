@@ -24,13 +24,6 @@ logging.addLevelName(ANALYSIS_LEVEL, 'ANALYSIS')
 logger = logging.getLogger(__name__)
 logger.setLevel(ANALYSIS_LEVEL)
 
-# Avoid using @st.cache_resource for the OpenAI API connection.
-# Caching resources like an API connection can lead to issues since the OpenAI API client 
-# manages state, and caching might cause problems if the state changes or if there are 
-# session-specific requirements. Moreover, OpenAI API connections do not need to be reused across 
-# sessions, and caching could result in stale or shared connections, which could lead to unintended behavior.
-def _get_openai_resource(openai_key):
-    return OpenAI(api_key = openai_key)
 
 # The container will be the same for all files in the session so only connect to it once.
 @st.cache_resource
@@ -89,9 +82,9 @@ def setup_for_azure():
         if st.session_state['use_environmental_variables']:
             load_dotenv()
 
-            if 'openai_client' not in st.session_state:
+            if 'openai_key' not in st.session_state:
                 openai_api_key = os.getenv("OPENAI_API_KEY_GDPR")
-                st.session_state['openai_client'] = _get_openai_resource(openai_api_key)
+                st.session_state['openai_key'] = openai_api_key
             if 'corpus_decryption_key' not in st.session_state:
                 st.session_state['corpus_decryption_key'] = os.getenv("DECRYPTION_KEY_GDPR")
             # blob storage for global and session logging
@@ -124,7 +117,7 @@ def setup_for_streamlit(insist_on_password = False):
         st.session_state['corpus_decryption_key'] = st.secrets["index"]["decryption_key"]
 
     if 'openai_api' not in st.session_state:
-        st.session_state['openai_client'] = _get_openai_resource(st.secrets['openai']['OPENAI_API_KEY'])
+        st.session_state['openai_key'] = st.secrets['openai']['OPENAI_API_KEY']
 
         if not insist_on_password:
             if "password_correct" not in st.session_state.keys():
@@ -193,19 +186,20 @@ def load_gdpr_corpus_index(key):
 
 def load_data():
     with st.spinner(text="Loading the excon documents and index - hang tight! This should take 5 seconds."):
+        embedding_parameters = EmbeddingParameters("text-embedding-3-large", 1024)
         corpus_index = load_gdpr_corpus_index(st.session_state['corpus_decryption_key'])
         model_to_use =  "gpt-4o"
+        chat_parameters = ChatParameters(chat_model = model_to_use, api_key=st.session_state['openai_key'], temperature = 0, max_tokens = 500, token_limit_when_truncating_message_queue = 3500)
+
         rerank_algo = RerankAlgos.LLM
-        rerank_algo.params["openai_client"] = st.session_state['openai_client']
+        rerank_algo.params["openai_client"] = chat_parameters.openai_client
         rerank_algo.params["model_to_use"] = model_to_use
         rerank_algo.params["user_type"] = corpus_index.user_type
         rerank_algo.params["corpus_description"] = corpus_index.corpus_description
         rerank_algo.params["final_token_cap"] = 5000 # can go large with the new models
 
-        embedding_parameters = EmbeddingParameters("text-embedding-3-large", 1024)
-        chat_parameters = ChatParameters(chat_model = model_to_use, temperature = 0, max_tokens = 500)
         
-        chat = CorpusChat(openai_client = st.session_state['openai_client'],
+        chat = CorpusChat(
                           embedding_parameters = embedding_parameters, 
                           chat_parameters = chat_parameters, 
                           corpus_index = corpus_index,

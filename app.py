@@ -86,7 +86,7 @@ try:
 
 except Exception as e:
     error_traceback = traceback.format_exc()
-    error_string = "user: " + st.session_state["user_id"] + ": \n" + error_traceback
+    error_string = "error: " + error_traceback
     logger = logging.getLogger(__name__)
     logger.error(error_string)
     write_global_data_to_blob()

@@ -44,8 +44,13 @@ def add_property_to_all_nodes(root, property_name, property_value):
 
 def anytree_to_treeitem(node):
     if not hasattr(node, 'full_node_name') or node.full_node_name == '':
+        if node.name == '':
+            name = 'Corpus'
+        else:
+            name = node.name
+
         return sac.TreeItem(
-        label= f'{node.name}',
+        label= name,
         children=[anytree_to_treeitem(child) for child in node.children] if node.children else None
         )
     else: 
@@ -110,30 +115,7 @@ if 'tree' not in st.session_state:
     st.session_state['tree'] = sac_tree_data
     st.session_state['tree_data'] = anytree_toc
 
-#selected = sac.tree(items=[st.session_state['tree']], label='Included Documents', index=0, size='md', return_index=True)
 selected = sac.tree(items=[st.session_state['tree']], label='Included Documents', size='md', return_index=True)
 
 st.write(get_text_for_node(selected), unsafe_allow_html=True)
 
-# for doc in included_docs:
-
-#     reference_checker = doc.reference_checker
-#     df = doc.document_as_df
-#     toc = StandardTableOfContent(root_node_name = "root", reference_checker = reference_checker, regulation_df = df)
-
-
-#     sac.tree(items=[
-#         sac.TreeItem(doc.document_name, children=[
-#             sac.TreeItem(node.get_name()),
-#             sac.TreeItem(node.get_name(), children=[
-#                 sac.TreeItem(node.get_name()),
-#                 sac.TreeItem(node.get_name()),
-#                 sac.TreeItem(node.get_name()),
-#             ]),
-#         ]),
-#         sac.TreeItem('disabled', disabled=True),
-#         sac.TreeItem('item3', children=[
-#             sac.TreeItem('item3-1'),
-#             sac.TreeItem('item3-2'),
-#         ]),
-#     ], label='GDPR Documents', index=0, format_func='title', size='md', icon='table', checkbox=True, checkbox_strict=True)
