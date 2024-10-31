@@ -100,7 +100,7 @@ for index, message in enumerate(st.session_state.messages):
 def clear_chat_history():
     st.session_state['chat'].reset_conversation_history()
     st.session_state['messages'] = [] 
-    write_session_data_to_blob('{"role": "action", "content": "Clear history"}')
+    write_session_data_to_local_file('action: Clear history')
 
 
 with st.sidebar:
@@ -135,7 +135,14 @@ with st.sidebar:
 
 def make_call_to_chat(prompt):
     logger.debug(f"Making call with prompt: {prompt}")                            
+    progress_placeholder = st.empty()
+    def update_progress(status):
+        progress_placeholder.text(f"{status}")
+    
+    st.session_state['chat'].set_progress_callback(update_progress)
+
     st.session_state['chat'].user_provides_input(prompt)
+
     raw_response = st.session_state['chat'].messages_intermediate[-1]
 
     id = str(uuid.uuid4())
@@ -154,6 +161,7 @@ def make_call_to_chat(prompt):
     display_assistant_response(row_to_add_to_messages, len(st.session_state['messages']) - 1)
     write_session_data_to_blob("assistant: " + raw_response["assistant_response"].create_openai_content() + "\n\n")
     logger.debug("Response added the the queue")
+    progress_placeholder.empty() 
 
 
 # User-provided prompt

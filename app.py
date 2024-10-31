@@ -7,7 +7,6 @@
     #     sys.argv[2] == "of"
     #     sys.argv[3] == "arguments"
 
-
 import streamlit as st
 import traceback
 import os
