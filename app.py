@@ -63,6 +63,7 @@ try:
             # run in streamlit community cloud using st.secretes for the username credentials and api keys
             st.session_state['service_provider'] = 'streamlit'
             # Parameter True means to include the username and password
+            # setup_for_streamlit(False)
             setup_for_streamlit(True)
 
     if 'chat' not in st.session_state:
@@ -75,19 +76,23 @@ try:
     pg = st.navigation({"Other things to do": [ask_question_page, toc_question_page, documentation_page]})
     pg.run()
 
-    setup_log_storage(st.session_state['blob_name_for_session_logs'])
-    # copy the existing local log file to blob storage. This is done at the beginning of the session becasue
-    # streamlit does not offer a direct session termination even. It is not idea as the logs will always be
-    # one session behind
-    if "global_logs_copied_to_storage" not in st.session_state:
-        write_global_data_to_blob()
-        st.session_state["global_logs_copied_to_storage"] = True
+    if 'service_provider' in st.session_state and st.session_state['service_provider'] == 'azure':
+        setup_log_storage(st.session_state['blob_name_for_session_logs'])
+        # copy the existing local log file to blob storage. This is done at the beginning of the session becasue
+        # streamlit does not offer a direct session termination even. It is not idea as the logs will always be
+        # one session behind
+        if "global_logs_copied_to_storage" not in st.session_state:
+            write_global_data_to_blob()
+            st.session_state["global_logs_copied_to_storage"] = True
 
 except Exception as e:
     error_traceback = traceback.format_exc()
     error_string = "error: " + error_traceback
     logger = logging.getLogger(__name__)
     logger.error(error_string)
-    write_global_data_to_blob()
-    write_session_data_to_blob(error_string)
+    
+    if 'service_provider' in st.session_state and st.session_state['service_provider'] == 'azure':
+        write_global_data_to_blob()
+        write_session_data_to_blob(error_string)
+    
     raise e

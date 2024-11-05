@@ -102,17 +102,6 @@ def setup_for_streamlit(insist_on_password = False):
     if 'service_provider' not in st.session_state:
         st.session_state['service_provider'] = 'streamlit'
 
-    # test to see if we are running locally or on the streamlit cloud
-    if 'app_path' not in st.session_state:
-        test_variable = platform.processor()
-        if test_variable: # running locally
-            st.session_state['app_path'] = "http://localhost:8501"
-        else: # we are on the cloud
-            st.session_state['app_path'] = "https://exconmanualchat.streamlit.app/"
-
-    if 'output_folder' not in st.session_state:
-        st.session_state['output_folder'] = "./user_data/"
-
     if 'corpus_decryption_key' not in st.session_state:
         st.session_state['corpus_decryption_key'] = st.secrets["index"]["decryption_key"]
 
@@ -168,10 +157,10 @@ def setup_for_streamlit(insist_on_password = False):
 
 # Currently only set up for azure using environmental variables. Other options need to be built
 def setup_log_storage(filename):
-    if st.session_state['service_provider'] == 'azure':
+    if 'service_provider' in st.session_state and st.session_state['service_provider'] == 'azure':
         if st.session_state['use_environmental_variables'] == True:
             if 'blob_account_url' not in st.session_state:
-                st.session_state['blob_account_url'] = "https://gdprragstorageaccount.blob.core.windows.net/"
+                st.session_state['blob_account_url'] = os.getenv('BLOB_ACCOUNT_URL', 'https://gdprragstorageaccount.blob.core.windows.net/')
                 st.session_state['blob_container_name'] = os.getenv('BLOB_CONTAINER', 'gdprtest01') # set a default in case 'BLOB_CONTAINER' is not set
                 st.session_state['blob_store_key'] = os.getenv("CHAT_BLOB_STORE")
                 st.session_state['blob_client_for_session_data'] = _get_blob_for_session_data_logging(filename)
@@ -210,11 +199,12 @@ def load_data():
 
 
 def write_session_data_to_blob(text):
-    if st.session_state['service_provider'] == 'azure':
+    if 'service_provider' in st.session_state and st.session_state['service_provider'] == 'azure':
         # Session log for user
         st.session_state['blob_client_for_session_data'].append_block(text + "\n")
 
 def write_global_data_to_blob():
-    with open(st.session_state['global_logging_file_name'], "r") as temp_file:
-        content = temp_file.read()
+    if 'service_provider' in st.session_state and st.session_state['service_provider'] == 'azure':
+        with open(st.session_state['global_logging_file_name'], "r") as temp_file:
+            content = temp_file.read()
     st.session_state['blob_client_for_global_data'].upload_blob(data=content, overwrite=True)
