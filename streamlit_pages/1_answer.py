@@ -100,7 +100,7 @@ for index, message in enumerate(st.session_state.messages):
 def clear_chat_history():
     st.session_state['chat'].reset_conversation_history()
     st.session_state['messages'] = [] 
-    write_session_data_to_local_file('action: Clear history')
+    write_session_data_to_blob('action: Clear history')
 
 
 with st.sidebar:
