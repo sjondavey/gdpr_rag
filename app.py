@@ -63,8 +63,8 @@ try:
             # run in streamlit community cloud using st.secretes for the username credentials and api keys
             st.session_state['service_provider'] = 'streamlit'
             # Parameter True means to include the username and password
-            # setup_for_streamlit(False)
-            setup_for_streamlit(True)
+            setup_for_streamlit(False)
+            # setup_for_streamlit(True)
 
     if 'chat' not in st.session_state:
         st.session_state['chat'] = load_data()
