@@ -53,7 +53,7 @@ python-dotenv==1.0.1
 pytz==2024.2
 referencing==0.35.1
 regex==2024.9.11
-regulations-rag==0.8.4.0
+regulations_rag @ git+https://github.com/sjondavey/regulations_rag.git@465a03c982d9c9a7f49cbc30d9695d8534ea3af4
 requests==2.32.3
 rich==13.9.4
 rpds-py==0.20.1
